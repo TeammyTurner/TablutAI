@@ -1,0 +1,4 @@
+.venv/
+logs/
+garbage/
+__pycache__
