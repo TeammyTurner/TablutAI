@@ -8,23 +8,30 @@ import multiprocessing as mp
 import time
 import subprocess
 import io
+from mcts.mcts import MCTS
+from tablut.game import Game, Player
+from tablut.rules.ashton import Board
+from tablut.player import RandomPlayer
+from copy import deepcopy
+import pprint
 
 
 class BaseClient(object):
     """
     Base client class to be subclassed
     """
+
     def __init__(self, host: str, port: int, turn: str):
         if turn.lower() not in ["white", "black"]:
             raise ValueError("turn can only be 'black' or 'white'")
-        
+
         self._host = host
         self._port = port
         self._turn = turn
-        
+
     def send_name(self, name: str, turn: str):
         raise NotImplementedError
-        
+
     def send_move(self, move: tuple):
         raise NotImplementedError
 
@@ -35,16 +42,39 @@ class BaseClient(object):
         raise NotImplementedError
 
 
+class GameEndedException(Exception):
+    """
+    Exception that gets thrown when the game is ended
+    """
+    pass
+
+
 class Client(BaseClient):
     """
     Client used to connect to the tablut server
     """
-    CELL_MAPPING = {
-        "EMPTY": 0,
-        "BLACK": -1,
-        "WHITE": 1,
-        "KING": 69
+    PIECE_MAPPING = {
+        "WHITE": 2,
+        "BLACK": -2,
+        "KING": 1,
+        "EMPTY": 0
     }
+    CELL_MAPPING = {
+        "WHITE": 1,
+        "BLACK": -1,
+        "KING": 69,
+        "EMPTY": 0
+    }
+    COLUMN_INDICES = ["A", "B", "C", "D", "E", "F", "G", "H", "J"]
+    EMPTY_BOARD = [[0, 0.3, 0.3, -0.5, -0.5, -0.5, 0.3, 0.3, 0],
+                   [0.3, 0, 0, 0, -0.5, 0, 0, 0, 0.3],
+                   [0.3, 0, 0, 0, 0, 0, 0, 0, 0.3],
+                   [-0.5, 0, 0, 0, 0, 0, 0, 0, -0.5],
+                   [-0.5, -0.5, 0, 0, 0.7, 0, 0, -0.5, -0.5],
+                   [-0.5, 0, 0, 0, 0, 0, 0, 0, -0.5],
+                   [0.3, 0, 0, 0, 0, 0, 0, 0, 0.3],
+                   [0.3, 0, 0, 0, -0.5, 0, 0, 0, 0.3],
+                   [0, 0.3, 0.3, -0.5, -0.5, -0.5, 0.3, 0.3, 0]]
 
     def __init__(self, host: str, port: int, turn: str):
         super().__init__(host, port, turn)
@@ -56,11 +86,12 @@ class Client(BaseClient):
         length = len(encoded).to_bytes(4, 'big')
         self._sock.sendall(length + encoded)
 
-    def send_move(self, move: tuple):
+    def send_move(self, start, end):
         """
         Sends move to the server.
         Move[0] is the starting position, move[1] the ending position
         """
+        move = self.convert_move(start, end)
         move_obj = {
             "from": move[0],
             "to": move[1]
@@ -69,6 +100,17 @@ class Client(BaseClient):
         encoded = json.dumps(move_obj).encode("UTF-8")
         length = len(encoded).to_bytes(4, 'big')
         self._sock.sendall(length+encoded)
+
+    def convert_board(self, java_board):
+        board = np.array(self.EMPTY_BOARD)
+        for row_i, row in enumerate(board):
+            for column_i, column in enumerate(row):
+                board[row_i][column_i] = column + \
+                    self.PIECE_MAPPING[java_board[row_i][column_i]]
+        return board
+
+    def convert_move(self, start, end):
+        return (self.COLUMN_INDICES[start[1]]+str(start[0]+1), self.COLUMN_INDICES[end[1]]+str(end[0]+1))
 
     def receive_state(self):
         """
@@ -86,11 +128,7 @@ class Client(BaseClient):
 
         state = json.loads(state)
 
-        # convert cell to own mapping
-        state["board"] = [list(map(lambda x: self.CELL_MAPPING[x], row))
-                          for row in state["board"]]
-
-        return state["board"], state["turn"].lower()
+        return self.convert_board(state["board"]), state["turn"].lower()
 
     def close(self):
         self._sock.close()
@@ -100,12 +138,12 @@ class RandomClient(BaseClient):
     """
     Wrapper for java random client
     """
-    
+
     def __init__(self, host: str, port: int, turn: str):
         self._host = host
         self._port = port
         self._turn = turn
-    
+
     def send_name(self, name: str):
         """
         Name is actually sent by the java script, just ignore the param
@@ -137,24 +175,57 @@ class RandomClient(BaseClient):
     def close(self):
         self._process.terminate()
 
+
+TURN_MAPPING = {
+    "black": Player.BLACK,
+    "white": Player.WHITE
+}
+
 if __name__ == "__main__":
     # Test client from command line
     import server_wrapper
+
+    OUR_PLAYER = Player.WHITE
+    # mcts parameters
+    num_reads = 3
+    max_depth = 50
 
     server = server_wrapper.TablutServerWrapper()
     server.start()
 
     host = "localhost"
-    c1 = Client(host, server.black_port, "black")
+    c1 = Client(host, server.white_port, "white")
     c1.send_name("client_1")
 
-    c2 = RandomClient(host, server.white_port, "white")
-    c2.send_name("random_client")
+    c2 = Client(host, server.black_port, "black")
+    c2.send_name("client_2")
 
-    state1 = None
-    while state1 is None:
-        state1 = c1.receive_state()
-    print(state1)
+    board = Board()
+    game = Game(board)
+    # Main game loop
+    try:
+        while not game.ended:
+            state = None
+            while state is None:
+                state, turn = c1.receive_state()
+                game.board.board = state
+                if turn not in ["black", "white"]:
+                    raise GameEndedException
+                game.turn = TURN_MAPPING[turn]
+                print(state, turn)
+            if game.turn == OUR_PLAYER:
+                mcts = MCTS(deepcopy(game), max_depth=max_depth)
+                start, end = mcts.search(num_reads)
+                print(start, end)
+                c1.send_move(start, end)
+            else:  # SELF PLAY! Remove this to really play against someone else
+                mcts = MCTS(deepcopy(game), max_depth=max_depth)
+                start, end = mcts.search(num_reads)
+                print(start, end)
+                # Having sent the move, we wait for the next state
+                c2.send_move(start, end)
+    except GameEndedException:
+        print("Game ended with state {}".format(turn))
 
     c1.close()
     c2.close()
