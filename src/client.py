@@ -96,7 +96,7 @@ class Client(BaseClient):
             "from": move[0],
             "to": move[1]
         }
-
+        print(move)
         encoded = json.dumps(move_obj).encode("UTF-8")
         length = len(encoded).to_bytes(4, 'big')
         self._sock.sendall(length+encoded)
@@ -164,7 +164,7 @@ class RandomClient(BaseClient):
 
         time.sleep(1)
 
-    def send_move(self, move: tuple):
+    def send_move(self):
         # Move is automatically sent by the process
         pass
 
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     c1 = Client(host, server.white_port, "white")
     c1.send_name("client_1")
 
-    c2 = Client(host, server.black_port, "black")
+    c2 = RandomClient(host, server.black_port, "black")
     c2.send_name("client_2")
 
     board = Board()
@@ -219,11 +219,11 @@ if __name__ == "__main__":
                 print(start, end)
                 c1.send_move(start, end)
             else:  # SELF PLAY! Remove this to really play against someone else
-                mcts = MCTS(deepcopy(game), max_depth=max_depth)
-                start, end = mcts.search(num_reads)
-                print(start, end)
+                #mcts = MCTS(deepcopy(game), max_depth=max_depth)
+                #start, end = mcts.search(num_reads)
+                #print(start, end)
                 # Having sent the move, we wait for the next state
-                c2.send_move(start, end)
+                c2.send_move()
     except GameEndedException:
         print("Game ended with state {}".format(turn))
 
