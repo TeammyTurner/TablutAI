@@ -1,1 +1,3 @@
 git+https://github.com/TeammyTurner/tablut-mcts.git
+git+https://github.com/TeammyTurner/tablutpy.git
+numpy
