@@ -1,4 +1,5 @@
 import settings
+import argparse
 import socket
 import json
 import numpy as np
@@ -182,18 +183,33 @@ PORTS = {
     "black": 5801
 }
 
-if __name__ == "__main__":
-    # Test client from command line
-    import server_wrapper
+PLAYER_NAMES = {
+    "white": "WANDA",
+    "black": "COSMO"
+}
 
-    OUR_PLAYER = Player.WHITE
+
+def setup_args():
+    '''Parse the given arguments'''
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--player',
+                        dest='player', type=str, required=True)
+    parser.add_argument('-h', '--host', dest='host',
+                        type=str, default="localhost")
+    args = parser.parse_args()
+    return args
+
+
+if __name__ == "__main__":
+    args = setup_args()
+
+    OUR_PLAYER = TURN_MAPPING[args["player"]]
     # mcts parameters
     num_reads = 3
     max_depth = 50
 
-    host = "localhost"
-    c1 = Client(host, PORTS["white"], "white")
-    c1.send_name("client_1")
+    c1 = Client(args["host"], PORTS[args["player"]], args["player"])
+    c1.send_name(PLAYER_NAMES[args["player"]])
 
     board = Board()
     game = Game(board)
