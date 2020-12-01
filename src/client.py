@@ -177,6 +177,11 @@ TURN_MAPPING = {
     "white": Player.WHITE
 }
 
+PORTS = {
+    "white": 5800,
+    "black": 5801
+}
+
 if __name__ == "__main__":
     # Test client from command line
     import server_wrapper
@@ -187,7 +192,7 @@ if __name__ == "__main__":
     max_depth = 50
 
     host = "localhost"
-    c1 = Client(host, server.white_port, "white")
+    c1 = Client(host, self.PORTS["white"], "white")
     c1.send_name("client_1")
 
     board = Board()
