@@ -203,13 +203,13 @@ def setup_args():
 if __name__ == "__main__":
     args = setup_args()
 
-    OUR_PLAYER = TURN_MAPPING[args["player"]]
+    OUR_PLAYER = TURN_MAPPING[args.player]
     # mcts parameters
     num_reads = 3
     max_depth = 50
 
-    c1 = Client(args["ip"], PORTS[args["player"]], args["player"])
-    c1.send_name(PLAYER_NAMES[args["player"]])
+    c1 = Client(args.ip, PORTS[args.player], args.player)
+    c1.send_name(PLAYER_NAMES[args.player])
 
     board = Board()
     game = Game(board)
