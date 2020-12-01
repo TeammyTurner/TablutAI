@@ -192,7 +192,7 @@ if __name__ == "__main__":
     max_depth = 50
 
     host = "localhost"
-    c1 = Client(host, self.PORTS["white"], "white")
+    c1 = Client(host, PORTS["white"], "white")
     c1.send_name("client_1")
 
     board = Board()
