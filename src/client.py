@@ -217,5 +217,3 @@ if __name__ == "__main__":
         print("Game ended with state {}".format(turn))
 
     c1.close()
-    c2.close()
-    server.stop()
