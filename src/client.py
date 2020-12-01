@@ -57,14 +57,10 @@ class Client(BaseClient):
         "WHITE": 2,
         "BLACK": -2,
         "KING": 1,
-        "EMPTY": 0
+        "EMPTY": 0,
+        "THRONE": 0.7
     }
-    CELL_MAPPING = {
-        "WHITE": 1,
-        "BLACK": -1,
-        "KING": 69,
-        "EMPTY": 0
-    }
+
     COLUMN_INDICES = ["A", "B", "C", "D", "E", "F", "G", "H", "J"]
     EMPTY_BOARD = [[0, 0, 0, -0.5, -0.5, -0.5, 0, 0, 0],
                    [0, 0, 0, 0, -0.5, 0, 0, 0, 0],
