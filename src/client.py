@@ -194,7 +194,7 @@ def setup_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--player',
                         dest='player', type=str, required=True)
-    parser.add_argument('-h', '--host', dest='host',
+    parser.add_argument('-i', '--ip', dest='ip',
                         type=str, default="localhost")
     args = parser.parse_args()
     return args
@@ -208,7 +208,7 @@ if __name__ == "__main__":
     num_reads = 3
     max_depth = 50
 
-    c1 = Client(args["host"], PORTS[args["player"]], args["player"])
+    c1 = Client(args["ip"], PORTS[args["player"]], args["player"])
     c1.send_name(PLAYER_NAMES[args["player"]])
 
     board = Board()
