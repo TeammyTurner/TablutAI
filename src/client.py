@@ -58,7 +58,7 @@ class Client(BaseClient):
         "BLACK": -2,
         "KING": 1,
         "EMPTY": 0,
-        "THRONE": 0.7
+        "THRONE": 0  # This should be 0.7 but we're already considering it in the EMPTY_BOARD
     }
 
     COLUMN_INDICES = ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
