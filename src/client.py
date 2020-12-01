@@ -61,7 +61,7 @@ class Client(BaseClient):
         "THRONE": 0.7
     }
 
-    COLUMN_INDICES = ["A", "B", "C", "D", "E", "F", "G", "H", "J"]
+    COLUMN_INDICES = ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
     EMPTY_BOARD = [[0, 0, 0, -0.5, -0.5, -0.5, 0, 0, 0],
                    [0, 0, 0, 0, -0.5, 0, 0, 0, 0],
                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
