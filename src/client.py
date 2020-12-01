@@ -190,15 +190,9 @@ if __name__ == "__main__":
     num_reads = 3
     max_depth = 50
 
-    server = server_wrapper.TablutServerWrapper()
-    server.start()
-
     host = "localhost"
     c1 = Client(host, server.white_port, "white")
     c1.send_name("client_1")
-
-    c2 = RandomClient(host, server.black_port, "black")
-    c2.send_name("client_2")
 
     board = Board()
     game = Game(board)
@@ -218,12 +212,6 @@ if __name__ == "__main__":
                 start, end = mcts.search(num_reads)
                 print(start, end)
                 c1.send_move(start, end)
-            else:  # SELF PLAY! Remove this to really play against someone else
-                #mcts = MCTS(deepcopy(game), max_depth=max_depth)
-                #start, end = mcts.search(num_reads)
-                #print(start, end)
-                # Having sent the move, we wait for the next state
-                c2.send_move()
     except GameEndedException:
         print("Game ended with state {}".format(turn))
 
