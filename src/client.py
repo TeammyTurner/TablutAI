@@ -196,6 +196,8 @@ def setup_args():
                         dest='player', type=str, required=True)
     parser.add_argument('-i', '--ip', dest='ip',
                         type=str, default="localhost")
+    parser.add_argument('-t', '--timeout', dest='timeout',
+                        type=int, default=50)
     args = parser.parse_args()
     return args
 
@@ -205,7 +207,6 @@ if __name__ == "__main__":
 
     OUR_PLAYER = TURN_MAPPING[args.player]
     # mcts parameters
-    num_reads = 3
     max_depth = 50
 
     c1 = Client(args.ip, PORTS[args.player], args.player)
@@ -226,7 +227,7 @@ if __name__ == "__main__":
                 print(state, turn)
             if game.turn == OUR_PLAYER:
                 mcts = MCTS(deepcopy(game), max_depth=max_depth)
-                start, end = mcts.search(num_reads)
+                start, end = mcts.search(args.timeout)
                 print(start, end)
                 c1.send_move(start, end)
     except GameEndedException:
