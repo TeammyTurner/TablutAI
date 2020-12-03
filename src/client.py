@@ -207,7 +207,7 @@ if __name__ == "__main__":
 
     OUR_PLAYER = TURN_MAPPING[args.player]
     # mcts parameters
-    max_depth = 50
+    max_depth = 150
 
     c1 = Client(args.ip, PORTS[args.player], args.player)
     c1.send_name(PLAYER_NAMES[args.player])
