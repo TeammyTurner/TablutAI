@@ -1,4 +1,3 @@
-import settings
 import argparse
 import socket
 import json
@@ -131,48 +130,6 @@ class Client(BaseClient):
         self._sock.close()
 
 
-class RandomClient(BaseClient):
-    """
-    Wrapper for java random client
-    """
-
-    def __init__(self, host: str, port: int, turn: str):
-        self._host = host
-        self._port = port
-        self._turn = turn
-
-    def send_name(self, name: str):
-        """
-        Name is actually sent by the java script, just ignore the param
-        The method itself starts a java process with random_player.jar
-        """
-        self._process = subprocess.Popen([
-            "java",
-            "-jar",
-            settings.TABLUT_RANDOM_PLAYER,
-            self._turn,
-            str(self._port)],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
-
-        for line in io.TextIOWrapper(self._process.stdout, encoding="utf-8"):
-            if "You are player" in line:
-                break
-
-        time.sleep(1)
-
-    def send_move(self):
-        # Move is automatically sent by the process
-        pass
-
-    def receive_state(self):
-        # No need to receive state, it's handled by process
-        pass
-
-    def close(self):
-        self._process.terminate()
-
-
 TURN_MAPPING = {
     "black": Player.BLACK,
     "white": Player.WHITE
@@ -212,12 +169,13 @@ if __name__ == "__main__":
     args = setup_args()
     player_arg = str(args.player).lower()
     OUR_PLAYER = TURN_MAPPING[player_arg]
-    # mcts parameters
+    # Fixing the parameters
     if player_arg == "black" and args.max_depth == WHITE_DEFAULT_MAX_DEPTH:
         max_depth = 35  # Default for black
     else:
         max_depth = args.max_depth
     C = args.C
+    timeout = int(args.timeout) - 5
 
     c1 = Client(args.ip, PORTS[player_arg], player_arg)
     c1.send_name(PLAYER_NAMES[player_arg])
@@ -238,7 +196,7 @@ if __name__ == "__main__":
             if game.turn == OUR_PLAYER:
                 mcts = MCTS(deepcopy(game), OUR_PLAYER,
                             max_depth=max_depth, C=C)
-                start, end = mcts.search(args.timeout)
+                start, end = mcts.search(timeout)
                 print(start, end)
                 c1.send_move(start, end)
     except GameEndedException:

@@ -61,12 +61,13 @@ This will install the two other modules too.
 
 ## Usage
 
-To start the player, first start the server, then run
+We created a bash script to start the player. You can find it in the main directory, named `launch.sh`. Launch it with the parameters that were specified in the PDF:
 
 ```
- $ python3 src/client.py -p white
+ $ ./launch.sh White 50 localhost
 ```
 
+Otherwise, you can directly launch the script in `src/client.py` with these arguments:
 The `-p` argument can either be `white` or `black`, and it contains the player that we'll impersonate.
 There's other args you can change. The most important is `-t`: this states the timeout for a move. It defaults to 50 seconds, but if you decide to shorten the time this should be changed accordingly.
 Then, `-d` states the tree's maximum depth, and `-C` changes the C factor for the MCTS. These should be left as default.
