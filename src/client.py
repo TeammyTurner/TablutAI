@@ -199,7 +199,7 @@ def setup_args():
     parser.add_argument('-t', '--timeout', dest='timeout',
                         type=int, default=50)
     parser.add_argument('-d', '--max-depth', dest='max_depth',
-                        type=int, default=20)
+                        type=int, default=40)
     parser.add_argument('-c', '--c', dest='C',
                         type=int, default=np.sqrt(2))
     args = parser.parse_args()
@@ -231,7 +231,8 @@ if __name__ == "__main__":
                 game.turn = TURN_MAPPING[turn]
                 print(state, turn)
             if game.turn == OUR_PLAYER:
-                mcts = MCTS(deepcopy(game), playing_as=OUR_PLAYER, max_depth=max_depth, C=C)
+                mcts = MCTS(deepcopy(game), playing_as=OUR_PLAYER,
+                            max_depth=max_depth, C=C)
                 start, end = mcts.search(args.timeout)
                 print(start, end)
                 c1.send_move(start, end)
