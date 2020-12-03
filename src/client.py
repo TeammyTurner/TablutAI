@@ -199,7 +199,7 @@ def setup_args():
     parser.add_argument('-t', '--timeout', dest='timeout',
                         type=int, default=50)
     parser.add_argument('-d', '--max-depth', dest='max_depth',
-                        type=int, default=40)
+                        type=int, default=20)
     parser.add_argument('-c', '--c', dest='C',
                         type=int, default=np.sqrt(2))
     args = parser.parse_args()
@@ -208,10 +208,12 @@ def setup_args():
 
 if __name__ == "__main__":
     args = setup_args()
-
     OUR_PLAYER = TURN_MAPPING[args.player]
     # mcts parameters
-    max_depth = args.max_depth
+    if args.player == "black" and args.max_depth == 20:
+        max_depth = 35  # Default for black
+    else:
+        max_depth = args.max_depth
     C = args.C
 
     c1 = Client(args.ip, PORTS[args.player], args.player)
