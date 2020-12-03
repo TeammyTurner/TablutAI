@@ -19,11 +19,9 @@
 - [About The Project](#about-the-project)
   - [How it works](#how-it-works)
 - [Getting Started](#getting-started)
-  - [Updates](#updates)
 - [Usage](#usage)
-- [Contributing](#contributing)
 - [License](#license)
-- [Contact](#contact)
+- [About us](#about-us)
 
 <!-- ABOUT THE PROJECT -->
 
