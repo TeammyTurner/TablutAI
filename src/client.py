@@ -198,6 +198,8 @@ def setup_args():
                         type=str, default="localhost")
     parser.add_argument('-t', '--timeout', dest='timeout',
                         type=int, default=50)
+    parser.add_argument('-d', '--max-depth', dest='max_depth',
+                        type=int, default=20)
     args = parser.parse_args()
     return args
 
@@ -207,7 +209,7 @@ if __name__ == "__main__":
 
     OUR_PLAYER = TURN_MAPPING[args.player]
     # mcts parameters
-    max_depth = 50
+    max_depth = args.max_depth
 
     c1 = Client(args.ip, PORTS[args.player], args.player)
     c1.send_name(PLAYER_NAMES[args.player])
