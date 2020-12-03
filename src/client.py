@@ -210,16 +210,17 @@ def setup_args():
 
 if __name__ == "__main__":
     args = setup_args()
-    OUR_PLAYER = TURN_MAPPING[args.player]
+    player_arg = str(args.player).lower()
+    OUR_PLAYER = TURN_MAPPING[player_arg]
     # mcts parameters
-    if args.player == "black" and args.max_depth == WHITE_DEFAULT_MAX_DEPTH:
+    if player_arg == "black" and args.max_depth == WHITE_DEFAULT_MAX_DEPTH:
         max_depth = 35  # Default for black
     else:
         max_depth = args.max_depth
     C = args.C
 
-    c1 = Client(args.ip, PORTS[args.player], args.player)
-    c1.send_name(PLAYER_NAMES[args.player])
+    c1 = Client(args.ip, PORTS[player_arg], player_arg)
+    c1.send_name(PLAYER_NAMES[player_arg])
 
     board = Board()
     game = Game(board)
