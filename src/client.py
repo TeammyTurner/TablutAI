@@ -231,7 +231,7 @@ if __name__ == "__main__":
                 game.turn = TURN_MAPPING[turn]
                 print(state, turn)
             if game.turn == OUR_PLAYER:
-                mcts = MCTS(deepcopy(game), playing_as=OUR_PLAYER,
+                mcts = MCTS(deepcopy(game), OUR_PLAYER,
                             max_depth=max_depth, C=C)
                 start, end = mcts.search(args.timeout)
                 print(start, end)
