@@ -200,6 +200,8 @@ def setup_args():
                         type=int, default=50)
     parser.add_argument('-d', '--max-depth', dest='max_depth',
                         type=int, default=20)
+    parser.add_argument('-c', '--c', dest='C',
+                        type=int, default=np.sqrt(2))
     args = parser.parse_args()
     return args
 
@@ -210,6 +212,7 @@ if __name__ == "__main__":
     OUR_PLAYER = TURN_MAPPING[args.player]
     # mcts parameters
     max_depth = args.max_depth
+    C = args.C
 
     c1 = Client(args.ip, PORTS[args.player], args.player)
     c1.send_name(PLAYER_NAMES[args.player])
@@ -228,7 +231,7 @@ if __name__ == "__main__":
                 game.turn = TURN_MAPPING[turn]
                 print(state, turn)
             if game.turn == OUR_PLAYER:
-                mcts = MCTS(deepcopy(game), max_depth=max_depth)
+                mcts = MCTS(deepcopy(game), max_depth=max_depth, C=C)
                 start, end = mcts.search(args.timeout)
                 print(start, end)
                 c1.send_move(start, end)
